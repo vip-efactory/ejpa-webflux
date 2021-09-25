@@ -7,10 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import vip.efactory.ejpa.base.entity.BaseEntity;
 import vip.efactory.ejpa.datafilter.DataFilter;
 
-import java.util.*;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Description:服务层接口的父接口，继承此接口默认下面的这些方法要实现的，采用泛型的写法
@@ -27,7 +32,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      *
      * @return Iterable
      */
-    Iterable<T> findAll();
+    Flux<T> findAll();
 
     /**
      * Description:
@@ -35,7 +40,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 分页对象
      * @return Page
      */
-    Page<T> findAll(Pageable var1);
+    Flux<T> findAll(Pageable var1);
 
     //List<T> findAll(Sort var1);
 
@@ -45,7 +50,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 sort对象
      * @return Iterable
      */
-    Iterable<T> findAll(Sort var1);
+    Flux<T> findAll(Sort var1);
 
     //List<T> findAllById(Iterable<ID> var1);
 
@@ -55,7 +60,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 可迭代的id集合
      * @return java.lang.Iterable
      */
-    Iterable<T> findAllById(Iterable<ID> var1);
+    Mono<T> findAllById(Iterable<ID> var1);
 
     /**
      * Description:
@@ -63,7 +68,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 id
      * @return T
      */
-    T getOne(ID var1);
+    Mono<T> getOne(ID var1);
 
     /**
      * Description:
@@ -100,7 +105,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return all entities matching the given {@link Example}.
      * @since 1.10
      */
-    <S extends T> Iterable<S> findAll(Example<S> example, Sort sort);
+    <S extends T> Flux<S> findAll(Example<S> example, Sort sort);
 
     /**
      * Returns a {@link Page} of entities matching the given {@link Example}. In case no match could be found, an empty
@@ -110,7 +115,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param pageable can be {@literal null}.
      * @return a {@link Page} of entities matching the given {@link Example}.
      */
-    <S extends T> Page<S> findAll(Example<S> example, Pageable pageable);
+    <S extends T> Flux<S> findAll(Example<S> example, Pageable pageable);
 
 
     // 下面是保存的方法
@@ -123,20 +128,12 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 可迭代的实体集合
      * @return java.lang.Iterable
      */
-    <S extends T> Iterable<S> saveAll(Iterable<S> var1);
+    <S extends T> Flux<S> saveAll(Iterable<S> var1);
 
     /**
      * Description:
      */
-    void flush();
-
-    /**
-     * Description:
-     *
-     * @param var1 实体
-     * @return S
-     */
-    <S extends T> S saveAndFlush(S var1);
+    Mono<Void> flush();
 
     /**
      * Description:
@@ -144,7 +141,15 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 实体
      * @return S
      */
-    <S extends T> S save(S var1);
+    <S extends T> Mono<S> saveAndFlush(S var1);
+
+    /**
+     * Description:
+     *
+     * @param var1 实体
+     * @return S
+     */
+    <S extends T> Mono<S> save(S var1);
 
     // 下面是删除的方法
 
@@ -153,36 +158,36 @@ public interface IBaseService<T extends BaseEntity, ID> {
      *
      * @param var1 实体
      */
-    void delete(T var1);
+    Mono<Void> delete(T var1);
 
     /**
      * @param var1 id
      */
-    void deleteById(ID var1);
+    Mono<Void> deleteById(ID var1);
 
     /**
      * Description:
      */
-    void deleteAll();
-
-    /**
-     * Description:
-     *
-     * @param var1 可迭代的对象
-     */
-    void deleteAll(Iterable<? extends T> var1);
-
-    /**
-     * Description:
-     */
-    void deleteAllInBatch();
+    Mono<Void> deleteAll();
 
     /**
      * Description:
      *
      * @param var1 可迭代的对象
      */
-    void deleteInBatch(Iterable<T> var1);
+    Mono<Void> deleteAll(Iterable<? extends T> var1);
+
+    /**
+     * Description:
+     */
+    Mono<Void> deleteAllInBatch();
+
+    /**
+     * Description:
+     *
+     * @param var1 可迭代的对象
+     */
+    Mono<Void> deleteInBatch(Iterable<T> var1);
 
     // 下面是检查存在性及计数
 
@@ -192,14 +197,14 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param var1 id主键
      * @return boolean true存在，false 不存在
      */
-    boolean existsById(ID var1);
+    Mono<Boolean> existsById(ID var1);
 
     /**
      * Description:
      *
      * @return long
      */
-    long count();
+    Mono<Long> count();
 
     /**
      * Returns the number of instances matching the given {@link Example}.
@@ -207,7 +212,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param example the {@link Example} to count instances for. Must not be {@literal null}.
      * @return the number of instances matching the {@link Example}.
      */
-    <S extends T> long count(Example<S> example);
+    <S extends T> Mono<Long> count(Example<S> example);
 
     /**
      * Checks whether the data store contains elements that match the given {@link Example}.
@@ -215,7 +220,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param example the {@link Example} to use for the existence check. Must not be {@literal null}.
      * @return {@literal true} if the data store contains elements that match the given {@link Example}.
      */
-    <S extends T> boolean exists(Example<S> example);
+    <S extends T> Mono<Boolean> exists(Example<S> example);
 
     // 上面的方法是框架自带的，下面的是用户自定义的方法
 
@@ -227,7 +232,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param propertyValue 实体的属性名对应的值,仅支持简单的基本类型的值为字符串的，不支持其他的自定义类的类型
      * @return boolean true实体存在；false 不存在。
      */
-    boolean existsByEntityProperty(String propertyName,String propertyValue) throws NoSuchFieldException;
+    Mono<Boolean> existsByEntityProperty(String propertyName,String propertyValue) throws NoSuchFieldException;
 
     /**
      * Description:使用主键批量删除
@@ -236,7 +241,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return int
      * @author dbdu
      */
-    int deleteAllById(Iterable<ID> var1);
+    Mono<Integer> deleteAllById(Iterable<ID> var1);
 
     /**
      * Description:更新实体的方法，很多时候保存和更新的处理逻辑是不一样的，权限也是不一样的，所以单独分开
@@ -245,7 +250,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return S
      * @author dbdu
      */
-    <S extends T> S update(S var1);
+    <S extends T> Mono<S> update(S var1);
 
 //    /**
 //     * Description:根据实体的编号，判断数据库中是否存在实体
@@ -263,7 +268,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return java.util.List&lt;T&gt;
      * @author dbdu
      */
-    List<T> advancedQuery(T entity);
+    Flux<T> advancedQuery(T entity);
 
     /**
      * Description: 高级模糊查询及分页
@@ -273,7 +278,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return org.springframework.data.domain.Page&lt;T&gt;
      * @author dbdu
      */
-    Page<T> advancedQuery(T entity, Pageable pageable);
+    Flux<T> advancedQuery(T entity, Pageable pageable);
 
 
     /**
@@ -323,7 +328,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return org.springframework.data.domain.Page&lt;T&gt;
      * @author dbdu
      */
-    Page<T> advancedQuery(T entity, Pageable pageable, DataFilter filter);
+    Flux<T> advancedQuery(T entity, Pageable pageable, DataFilter filter);
 
     /**
      * Description: 带数据过滤的分页对象
@@ -332,7 +337,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param filter 分页对象
      * @return Page
      */
-    Page<T> findAll(Pageable var1, DataFilter filter);
+    Flux<T> findAll(Pageable var1, DataFilter filter);
 
     /**
      * 根据查询条件及过滤条件查询列表数据
@@ -341,7 +346,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param filter 数据过滤条件
      * @return List<T>
      */
-    Iterable<T> getListByFilter(Specification<T> spec, DataFilter filter);
+    Flux<T> getListByFilter(Specification<T> spec, DataFilter filter);
 
     /**
      * 根据查询条件及过滤条件查询分页数据
@@ -350,7 +355,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param filter   数据过滤条件
      * @return Page<T>
      */
-    Page<T> getPageByFilter(Pageable pageable, DataFilter filter);
+    Flux<T> getPageByFilter(Pageable pageable, DataFilter filter);
 
     /**
      * 根据查询条件及过滤条件查询分页数据
@@ -360,7 +365,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param filter   数据过滤条件
      * @return Page<T>
      */
-    Page<T> getPageByFilter(Pageable pageable, Specification<T> spec, DataFilter filter);
+    Flux<T> getPageByFilter(Pageable pageable, Specification<T> spec, DataFilter filter);
 
     /**
      * 根据查询条件及过滤条件查询总共有的记录数量
@@ -369,7 +374,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param filter 数据过滤条件
      * @return long 数值
      */
-//    <S extends T> long getCountByFilter(Specification<S> spec, DataFilter filter);
+//    <S extends T> Mono<Long> getCountByFilter(Specification<S> spec, DataFilter filter);
 
 
     /**
@@ -380,7 +385,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param <S>     实体或者实体的子类
      * @return 集合
      */
-    //<S extends T> Iterable<S> findAllByFilter(Example<S> example, DataFilter filter);
+    //<S extends T> Flux<S> findAllByFilter(Example<S> example, DataFilter filter);
 
     /**
      * 使用基于example的查询条件及过滤条件查询分页数据
@@ -391,7 +396,7 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param <S>      实体或者实体的子类
      * @return 分页数据
      */
-    //<S extends T> Page<S> findPageByFilter(Example<S> example, Pageable pageable, DataFilter filter);
+    //<S extends T> Flux<S> findPageByFilter(Example<S> example, Pageable pageable, DataFilter filter);
 
     /**
      * 使用基于example的查询条件及过滤条件查询匹配的记录数量
@@ -401,6 +406,6 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @param <S>     实体或者实体的子类
      * @return 匹配的数量
      */
-    //<S extends T> long findCountByFilter(Example<S> example, DataFilter filter);
+    //<S extends T> Mono<Long> findCountByFilter(Example<S> example, DataFilter filter);
 
 }

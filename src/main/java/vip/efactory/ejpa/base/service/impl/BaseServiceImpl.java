@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
 import vip.efactory.common.base.entity.BaseSearchField;
 import vip.efactory.common.base.enums.ConditionRelationEnum;
 import vip.efactory.common.base.enums.SearchTypeEnum;
@@ -137,22 +138,22 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
 
 
     @Override
-    public Iterable<T> findAll() {
+    public Flux<T> findAll() {
         return br.findAll();
     }
 
     @Override
-    public Page<T> findAll(Pageable var1) {
+    public Flux<T> findAll(Pageable var1) {
         return br.findAll(var1);
     }
 
     @Override
-    public Iterable<T> findAll(Sort var1) {
+    public Flux<T> findAll(Sort var1) {
         return br.findAll(var1);
     }
 
     @Override
-    public Iterable<T> findAllById(Iterable<ID> var1) {
+    public Flux<T> findAllById(Iterable<ID> var1) {
         return br.findAllById(var1);
     }
 
@@ -173,22 +174,22 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     }
 
     @Override
-    public <S extends T> List<S> findAll(Example<S> var1) {
+    public <S extends T> Flux<S> findAll(Example<S> var1) {
         return br.findAll(var1);
     }
 
     @Override
-    public <S extends T> List<S> findAll(Example<S> var1, Sort var2) {
+    public <S extends T> Flux<S> findAll(Example<S> var1, Sort var2) {
         return br.findAll(var1, var2);
     }
 
     @Override
-    public <S extends T> Page<S> findAll(Example<S> example, Pageable pageable) {
+    public <S extends T> Flux<S> findAll(Example<S> example, Pageable pageable) {
         return br.findAll(example, pageable);
     }
 
     @Override
-    public <S extends T> Iterable<S> saveAll(Iterable<S> var1) {
+    public <S extends T> Flux<S> saveAll(Iterable<S> var1) {
         return br.saveAll(var1);
     }
 
@@ -299,7 +300,7 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
      * @date 19-7-5 下午12:26
      */
     @Override
-    public List<T> advancedQuery(T entity) {
+    public Flux<T> advancedQuery(T entity) {
         if (entity.getConditions() != null && entity.getConditions().size() > 0) {
             return br.findAll(getSpecification(entity));
         } else {
@@ -318,7 +319,7 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
      * @date 19-7-5 下午12:27
      */
     @Override
-    public Page<T> advancedQuery(T entity, Pageable pageable) {
+    public Flux<T> advancedQuery(T entity, Pageable pageable) {
         if (entity.getConditions() != null && entity.getConditions().size() > 0) {
             //构造动态查询的条件
             Specification<T> specification = getSpecification(entity);
@@ -339,7 +340,7 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
      * @date 19-7-5 下午12:27
      */
     @Override
-    public Page<T> advancedQuery(T entity, Pageable pageable, DataFilter dataFilter) {
+    public Flux<T> advancedQuery(T entity, Pageable pageable, DataFilter dataFilter) {
         if (entity.getConditions() != null && entity.getConditions().size() > 0) {
             //构造动态查询的条件
             Specification<T> specification = getSpecification(entity);
@@ -357,7 +358,7 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
         }
         // 构造查询条件
         Specification<Object> specification = getSpec4PropSetByLike(property, value);
-        List<Object> result = br.findAll(specification);
+        Flux<Object> result = br.findAll(specification);
 
         if (result != null && result.size() > 0) {
             return new TreeSet<Object>(result); // 去除重复数据

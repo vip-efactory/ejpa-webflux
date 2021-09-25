@@ -4,10 +4,11 @@ package vip.efactory.ejpa.base.controller;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import vip.efactory.common.base.entity.BaseSearchField;
 import vip.efactory.common.base.enums.SearchTypeEnum;
 import vip.efactory.common.base.page.EPage;
@@ -27,7 +28,10 @@ import javax.validation.groups.Default;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -81,7 +85,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return R
      */
     public R getByPage(Pageable page) {
-        Page<T1> entities = entityService.findAll(page);
+        Flux<T1> entities = entityService.findAll(page);
         EPage ePage = new EPage(entities);
         return R.ok().setData(ePage);
     }
@@ -94,7 +98,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return R
      */
     public R advancedQueryByPage(Pageable page, T1 entity) {
-        Page<T1> entities = entityService.advancedQuery(entity, page);
+        Flux<T1> entities = entityService.advancedQuery(entity, page);
         EPage ePage = new EPage(entities);
         return R.ok().setData(ePage);
     }
@@ -106,7 +110,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return R
      */
     public R advancedQuery(T1 entity) {
-        List<T1> entities = entityService.advancedQuery(entity);
+        Flux<T1> entities = entityService.advancedQuery(entity);
         return R.ok().setData(entities);
     }
 
@@ -124,7 +128,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         // 构造高级查询条件
         T1 be = buildQueryConditions(q, fields);
 
-        List<T1> entities = entityService.advancedQuery(be);
+        Flux<T1> entities = entityService.advancedQuery(be);
         return R.ok().setData(entities);
     }
 
@@ -142,7 +146,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         }
         // 构造高级查询条件
         T1 be = buildQueryConditions(q, fields);
-        Page<T1> entities = entityService.advancedQuery(be, page);
+        Flux<T1> entities = entityService.advancedQuery(be, page);
         EPage ePage = new EPage(entities);
         return R.ok().setData(ePage);
     }
@@ -182,8 +186,8 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
             return R.error(CommAPIEnum.PROPERTY_CHECK_FAILED).setData(errors);
         }
 
-        entityService.save(entity);
-        R r = R.ok().setData(entity);
+        Mono<T1> backEntity = entityService.save(entity);
+        R r = R.ok().setData(backEntity);
         return r;
 
     }
@@ -310,9 +314,9 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @param entityId 实体主键id
      * @return Boolean true存在，false 不存在
      */
-    public Boolean chkEntityIdExist(ID entityId) {
-        return null != entityId && entityService.existsById(entityId);
-    }
+//    public Boolean chkEntityIdExist(ID entityId) {
+//        return null != entityId && entityService.existsById(entityId);
+//    }
 
 
     /**
@@ -343,12 +347,12 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return T1
      * @author dbdu
      */
-    private T1 updateEntity(T1 dbEntity, T1 entity, Boolean useNull, String... ignoreProperties) {
+    private Mono<T1> updateEntity(T1 dbEntity, T1 entity, Boolean useNull, String... ignoreProperties) {
         if (!useNull) {
             // 将前端来的数据空值用数据库中的值补上
             UpdatePoUtil.copyNullProperties(dbEntity, entity, ignoreProperties);
         }
-        return (T1) entityService.update(entity);
+        return entityService.update(entity);
     }
 
     /**
