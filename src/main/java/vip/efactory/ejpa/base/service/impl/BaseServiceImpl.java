@@ -1,18 +1,19 @@
 package vip.efactory.ejpa.base.service.impl;
 
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import vip.efactory.common.base.entity.BaseSearchField;
 import vip.efactory.common.base.enums.ConditionRelationEnum;
 import vip.efactory.common.base.enums.SearchTypeEnum;
@@ -138,124 +139,123 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
 
 
     @Override
+    public <S extends T> Mono<S> save(S entity) {
+        return br.save(entity);
+    }
+
+    @Override
+    public <S extends T> Flux<S> saveAll(Iterable<S> entities) {
+        return br.saveAll(entities);
+    }
+
+    @Override
+    public <S extends T> Flux<S> saveAll(Publisher<S> entityStream) {
+        return br.saveAll(entityStream);
+    }
+
+    @Override
+    public Mono<T> findById(ID id) {
+        return br.findById(id);
+    }
+
+    @Override
+    public Mono<T> findById(Publisher<ID> id) {
+        return br.findById(id);
+    }
+
+    @Override
+    public Mono<Boolean> existsById(ID id) {
+        return br.existsById(id);
+    }
+
+    @Override
+    public Mono<Boolean> existsById(Publisher<ID> id) {
+        return br.existsById(id);
+    }
+
+    @Override
     public Flux<T> findAll() {
         return br.findAll();
     }
 
     @Override
-    public Flux<T> findAll(Pageable var1) {
-        return br.findAll(var1);
+    public Flux<T> findAllById(Iterable<ID> ids) {
+        return br.findAllById(ids);
     }
 
     @Override
-    public Flux<T> findAll(Sort var1) {
-        return br.findAll(var1);
+    public Flux<T> findAllById(Publisher<ID> idStream) {
+        return br.findAllById(idStream);
     }
 
     @Override
-    public Flux<T> findAllById(Iterable<ID> var1) {
-        return br.findAllById(var1);
-    }
-
-    @Override
-    //@CachePut(value = "className", key = "this.className+'--' +#id.keyString()")
-    public T getOne(ID id) {
-        return (T) br.getOne(id);
-    }
-
-    @Override
-    public Optional<T> findById(ID var1) {
-        return br.findById(var1);
-    }
-
-    @Override
-    public <S extends T> Optional<S> findOne(Example<S> example) {
-        return br.findOne(example);
-    }
-
-    @Override
-    public <S extends T> Flux<S> findAll(Example<S> var1) {
-        return br.findAll(var1);
-    }
-
-    @Override
-    public <S extends T> Flux<S> findAll(Example<S> var1, Sort var2) {
-        return br.findAll(var1, var2);
-    }
-
-    @Override
-    public <S extends T> Flux<S> findAll(Example<S> example, Pageable pageable) {
-        return br.findAll(example, pageable);
-    }
-
-    @Override
-    public <S extends T> Flux<S> saveAll(Iterable<S> var1) {
-        return br.saveAll(var1);
-    }
-
-    @Override
-    public void flush() {
-        br.flush();
-    }
-
-    @Override
-    public <S extends T> S saveAndFlush(S var1) {
-        return (S) br.saveAndFlush(var1);
-    }
-
-    @Override
-    public <S extends T> S save(S var1) {
-        return (S) br.save(var1);
-    }
-
-    @Override
-    public void delete(T var1) {
-        br.delete(var1);
-    }
-
-    @Override
-    public void deleteById(ID var1) {
-        br.deleteById(var1);
-    }
-
-    @Override
-    public void deleteAll() {
-        br.deleteAll();
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends T> var1) {
-        br.deleteAll(var1);
-    }
-
-    @Override
-    public void deleteAllInBatch() {
-        br.deleteAllInBatch();
-    }
-
-    @Override
-    public void deleteInBatch(Iterable<T> var1) {
-        br.deleteInBatch(var1);
-    }
-
-    @Override
-    public boolean existsById(ID var1) {
-        return br.existsById(var1);
-    }
-
-    @Override
-    public long count() {
+    public Mono<Long> count() {
         return br.count();
     }
 
     @Override
-    public <S extends T> long count(Example<S> example) {
-        return br.count(example);
+    public Mono<Void> deleteById(ID id) {
+        return br.deleteById(id);
     }
 
     @Override
-    public <S extends T> boolean exists(Example<S> example) {
-        return br.exists(example);
+    public Mono<Void> deleteById(Publisher<ID> id) {
+        return br.deleteById(id);
+    }
+
+    @Override
+    public Mono<Void> delete(T entity) {
+        return br.delete(entity);
+    }
+
+    @Override
+    public Mono<Void> deleteAll(Iterable<? extends T> entities) {
+        return br.deleteAll(entities);
+    }
+
+    @Override
+    public Mono<Void> deleteAll(Publisher<? extends T> entityStream) {
+        return br.deleteAll(entityStream);
+    }
+
+    @Override
+    public Mono<Void> deleteAll() {
+        return br.deleteAll();
+    }
+
+    @Override
+    public Mono<T> findOne(com.querydsl.core.types.Predicate predicate) {
+        return br.findOne(predicate);
+    }
+
+    @Override
+    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate) {
+        return br.findAll(predicate);
+    }
+
+    @Override
+    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate, Sort sort) {
+        return br.findAll(predicate,sort);
+    }
+
+    @Override
+    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate, OrderSpecifier<?>... orders) {
+        return br.findAll(predicate, orders);
+    }
+
+    @Override
+    public Flux<T> findAll(OrderSpecifier<?>... orders) {
+        return br.findAll(orders);
+    }
+
+    @Override
+    public Mono<Long> count(com.querydsl.core.types.Predicate predicate) {
+        return br.count(predicate);
+    }
+
+    @Override
+    public Mono<Boolean> exists(com.querydsl.core.types.Predicate predicate) {
+        return br.exists(predicate);
     }
 
     //以下为自定义的方法：
@@ -281,14 +281,9 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     }
 
     @Override
-    public <S extends T> S update(S var1) {
-        return (S) br.save(var1);
+    public <S extends T> Mono<S> update(S var1) {
+        return br.save(var1);
     }
-
-    //   @Override
-//    public Boolean existsByEntityNum(String entityNum) {
-//        return br.existsByEntityNum(entityNum);
-//    }
 
 
     /**
@@ -299,16 +294,16 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
      * @author dbdu
      * @date 19-7-5 下午12:26
      */
-    @Override
-    public Flux<T> advancedQuery(T entity) {
-        if (entity.getConditions() != null && entity.getConditions().size() > 0) {
-            return br.findAll(getSpecification(entity));
-        } else {
-            //返回前25条数据！
-            return br.findTop25ByOrderByIdDesc();
-        }
-
-    }
+//    @Override
+//    public Flux<T> advancedQuery(T entity) {
+//        if (entity.getConditions() != null && entity.getConditions().size() > 0) {
+//            return br.findAll(getSpecification(entity));
+//        } else {
+//            //返回前25条数据！
+//            return br.findTop25ByOrderByIdDesc();
+//        }
+//
+//    }
 
     /**
      * Description: 高级查询带分页的功能,如果没有查询条件,仅分页返回
@@ -319,14 +314,19 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
      * @date 19-7-5 下午12:27
      */
     @Override
-    public Flux<T> advancedQuery(T entity, Pageable pageable) {
+    public Flux<T> advancedQuery(T entity) {
         if (entity.getConditions() != null && entity.getConditions().size() > 0) {
             //构造动态查询的条件
             Specification<T> specification = getSpecification(entity);
-            return br.findAll(specification, pageable);
+            return br.findAll(specification);
         } else {
-            return br.findAll(pageable);
+            return br.findAll();
         }
+    }
+
+    @Override
+    public Flux<T> advancedQuery(T entity, Pageable pageable) {
+        return null;
     }
 
     /**
@@ -340,13 +340,13 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
      * @date 19-7-5 下午12:27
      */
     @Override
-    public Flux<T> advancedQuery(T entity, Pageable pageable, DataFilter dataFilter) {
+    public Flux<T> advancedQuery(T entity, DataFilter dataFilter) {
         if (entity.getConditions() != null && entity.getConditions().size() > 0) {
             //构造动态查询的条件
             Specification<T> specification = getSpecification(entity);
-            return getPageByFilter(pageable, specification, dataFilter);
+            return getByFilter(specification, dataFilter);
         } else {
-            return getPageByFilter(pageable, dataFilter);
+            return getByFilter(dataFilter);
         }
     }
 
@@ -952,6 +952,16 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
 
     }
 
+    @Override
+    public Flux<T> advancedQuery(T entity, Pageable pageable, DataFilter filter) {
+        return null;
+    }
+
+    @Override
+    public Flux<T> findAll(Pageable var1, DataFilter filter) {
+        return null;
+    }
+
     /***************************************以下是数据范围相关的查询方法实现***************************************************/
 
     /**
@@ -974,33 +984,43 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
 
 
     @Override
-    public Page<T> findAll(Pageable page, DataFilter filter) {
+    public Flux<T> findAll(DataFilter filter) {
         // TODO 检测实体是否包含过滤的属性
         Specification<T> spec = handleDataFilterCondition(filter);
-        Page<T> page2 = br.findAll(spec, page);
+        Flux<T> page2 = br.findAll(spec);
         return page2;
     }
 
     @Override
-    public Iterable<T> getListByFilter(Specification<T> spec, DataFilter filter) {
+    public Flux<T> getListByFilter(Specification<T> spec, DataFilter filter) {
         Specification<T> filterSpec = handleDataFilterCondition(filter);
         Specification<T> finalSpec = filterSpec.and(spec);
-        List<T> data = br.findAll(finalSpec);
+        Flux<T> data = br.findAll(finalSpec);
         return data;
     }
 
     @Override
-    public Page<T> getPageByFilter(Pageable pageable, DataFilter filter) {
+    public Flux<T> getPageByFilter(Pageable pageable, DataFilter filter) {
+        return null;
+    }
+
+    @Override
+    public Flux<T> getPageByFilter(Pageable pageable, Specification<T> spec, DataFilter filter) {
+        return null;
+    }
+
+    @Override
+    public Flux<T> getPageByFilter(DataFilter filter) {
         Specification<T> filterSpec = handleDataFilterCondition(filter);
-        Page<T> page = br.findAll(filterSpec, pageable);
+        Flux<T> page = br.findAll(filterSpec);
         return page;
     }
 
     @Override
-    public Page<T> getPageByFilter(Pageable pageable, Specification<T> spec, DataFilter filter) {
+    public Flux<T> getByFilter(Specification<T> spec, DataFilter filter) {
         Specification<T> filterSpec = handleDataFilterCondition(filter);
         Specification<T> finalSpec = filterSpec.and(spec);
-        Page<T> page = br.findAll(finalSpec, pageable);
+        Flux<T> page = br.findAll(finalSpec);
         return page;
     }
 

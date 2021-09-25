@@ -19,27 +19,6 @@ import java.util.List;
 @NoRepositoryBean
 public interface BaseRepository<T extends BaseEntity, ID> extends ReactiveCrudRepository<T, ID>, ReactiveQuerydslPredicateExecutor<T> {
 
-//    /**
-//     * Description:根据实体的编号，判断数据库中是否存在实体
-//     *
-//     * @param entityNum 实体编码
-//     * @return java.lang.Boolean
-//     * @author dbdu
-//     */
-//    Boolean existsByEntityNum(String entityNum);
-
-
-    /**
-     * Description:这是一个多条件动态查询的例子，类似Mybatis中动态sql的功能
-     *
-     * @param spec     高级条件
-     * @param pageable 分页对象
-     * @return 分页对象
-     * @author dbdu
-     */
-    Flux<T> findAll(Specification<T> spec, Pageable pageable);
-
-
     /**
      * Description:使用条件查询，不分页
      *

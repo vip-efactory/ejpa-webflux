@@ -78,6 +78,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         //System.out.println(clazz.getSimpleName());
     }
 
+
     /**
      * Description:实体的分页查询，包括排序等,使用SpringData自己的对象接收分页参数
      *
@@ -85,7 +86,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return R
      */
     public R getByPage(Pageable page) {
-        Flux<T1> entities = entityService.findAll(page);
+        Flux<T1> entities = entityService.findAll();
         EPage ePage = new EPage(entities);
         return R.ok().setData(ePage);
     }
@@ -122,7 +123,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return R
      */
     public R queryMultiField(String q, String fields) {
-        if (StringUtils.isEmpty(fields)){
+        if (StringUtils.isEmpty(fields)) {
             return R.error(CommDBEnum.SELECT_PROPERTY_NAME_NOT_EMPTY);
         }
         // 构造高级查询条件
@@ -141,7 +142,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
      * @return R
      */
     public R queryMultiField(String q, String fields, Pageable page) {
-        if (StringUtils.isEmpty(fields)){
+        if (StringUtils.isEmpty(fields)) {
             return R.error(CommDBEnum.SELECT_PROPERTY_NAME_NOT_EMPTY);
         }
         // 构造高级查询条件
@@ -162,14 +163,9 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
             return R.error(CommDBEnum.KEY_NOT_NULL);
         }
 
-        Optional entity = entityService.findById(id);
+        Mono<T1> entity = entityService.findById(id);
 
-        if (entity.isPresent()) {
-            return R.ok().setData(entity.get());
-        } else {
-            return R.error(CommDBEnum.SELECT_NON_EXISTENT);
-        }
-
+        return R.ok().setData(entity);
     }
 
     /**
@@ -207,7 +203,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         }
 
         // 检查数据记录是否已经被删除了，被删除了，则不允许更新
-        Optional<T1> entityOptional = entityService.findById(entity.getId());
+        Mono<T1> entityOptional = entityService.findById(entity.getId());
         if (!entityOptional.isPresent()) {
             return R.error(CommDBEnum.UPDATE_NON_EXISTENT);
         } else {
