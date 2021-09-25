@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>vip.efactory</groupId>
+    <artifactId>ejpa-webflux</artifactId>
+    <version>0.0.1</version>
+    <packaging>jar</packaging>
+    <name>ejpa-webflux</name>
+    <description>基于jpa再封装,常用的模板CRUD,分页排序,多字段高级搜索,国际化，多租户等功能
+        (Re-encapsulation based on Spring Data jpa, commonly used template CRUD, paging sort, multi-field advanced search, internationalization, multi-tenancy and other functions)，https://github.com/vip-efactory/ejpa </description>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+        <beanutils.version>1.9.4</beanutils.version>
+        <swagger-starter.version>1.9.0.RELEASE</swagger-starter.version>
+        <lombok.version>1.18.12</lombok.version>
+        <common.i18n.version>1.2.1</common.i18n.version>
+        <common.base.version>1.2.0</common.base.version>
+        <validation.api.version>2.0.1.Final</validation.api.version>
+        <ali.ttl.version>2.11.4</ali.ttl.version>
+        <querydsl.version>4.3.1</querydsl.version>
+        <hutool.version>5.5.8</hutool.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring.boot.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- 阿里的本地线程安全存储 保存租户信息使用 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+            <version>${ali.ttl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>vip.efactory</groupId>
+            <artifactId>common-base</artifactId>
+            <version>${common.base.version}</version>
+        </dependency>
+        <!-- 引入国际化的依赖 -->
+        <dependency>
+            <groupId>vip.efactory</groupId>
+            <artifactId>common-i18n</artifactId>
+            <version>${common.i18n.version}</version>
+        </dependency>
+
+        <!-- lombok 工具依赖 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- 对象转为Map时需要 -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${beanutils.version}</version>
+        </dependency>
+
+        <!-- swagger 在线文档-->
+        <dependency>
+            <groupId>com.spring4all</groupId>
+            <artifactId>swagger-spring-boot-starter</artifactId>
+            <version>${swagger-starter.version}</version>
+        </dependency>
+        <!-- JPA的好搭档：querydsl jpa查询的依赖-->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+        <dependency>
+            <!-- QueryDSL依赖 -->
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <!-- 实体属性校验注解 -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>${validation.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+    </dependencies>
+
+    <url>https://github.com/vip-efactory/ejpa</url>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <tag>v1.0.0</tag>
+        <url>https://github.com/vip-efactory/ejpa-webflux.git</url>
+        <connection>scm:git:https://github.com/vip-efactory/ejpa-webflux.git</connection>
+        <developerConnection>scm:git:https://github.com/vip-efactory/ejpa-webflux.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>dusuanyun</name>
+            <email>dusuanyun@sina.com</email>
+            <organization>efactory.vip</organization>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <!--不对javadoc 做严格检查 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <additionalJOptions>
+                                <additionalJOption>
+                                    -Xdoclint:none
+                                </additionalJOption>
+                            </additionalJOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- JPAAnnotationProcessor查找使用javax.persistence.Entity注释进行注释的域类型，并为其生成查询类型。 -->
+            <!-- 如果您在域类型中使用Hibernate注释，则应改用APT处理器 com.querydsl.apt.hibernate.HibernateAnnotationProcessor 。 -->
+            <plugin>
+                <groupId>com.mysema.maven</groupId>
+                <artifactId>apt-maven-plugin</artifactId>
+                <version>1.1.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/generated-sources/java</outputDirectory>
+                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
