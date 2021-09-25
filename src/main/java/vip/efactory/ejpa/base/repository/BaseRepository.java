@@ -5,7 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Flux;
 import vip.efactory.ejpa.base.entity.BaseEntity;
 
@@ -17,7 +19,7 @@ import java.util.List;
  * @author dbdu
  */
 @NoRepositoryBean
-public interface BaseRepository<T extends BaseEntity, ID> extends ReactiveCrudRepository<T, ID>, ReactiveQuerydslPredicateExecutor<T> {
+public interface BaseRepository<T extends BaseEntity, ID> extends ReactiveSortingRepository<T, ID>, ReactiveQuerydslPredicateExecutor<T>, ReactiveQueryByExampleExecutor<T> {
 
     /**
      * Description:使用条件查询，不分页

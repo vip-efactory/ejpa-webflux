@@ -137,7 +137,61 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
         clazz = (Class<T>) types[0];
     }
 
+    // 查询方法
+    @Override
+    public Mono<T> findById(ID id) {
+        return br.findById(id);
+    }
 
+    @Override
+    public Mono<T> findById(Publisher<ID> id) {
+        return br.findById(id);
+    }
+    @Override
+    public Flux<T> findAll() {
+        return br.findAll();
+    }
+
+    @Override
+    public Flux<T> findAllById(Iterable<ID> ids) {
+        return br.findAllById(ids);
+    }
+
+    @Override
+    public Flux<T> findAllById(Publisher<ID> idStream) {
+        return br.findAllById(idStream);
+    }
+    @Override
+    public Mono<T> findOne(com.querydsl.core.types.Predicate predicate) {
+        return br.findOne(predicate);
+    }
+
+    @Override
+    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate) {
+        return br.findAll(predicate);
+    }
+
+    @Override
+    public Flux<T> findAll(Sort sort) {
+        return br.findAll(sort);
+    }
+
+    @Override
+    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate, Sort sort) {
+        return br.findAll(predicate,sort);
+    }
+
+    @Override
+    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate, OrderSpecifier<?>... orders) {
+        return br.findAll(predicate, orders);
+    }
+
+    @Override
+    public Flux<T> findAll(OrderSpecifier<?>... orders) {
+        return br.findAll(orders);
+    }
+
+    // 保存方法
     @Override
     public <S extends T> Mono<S> save(S entity) {
         return br.save(entity);
@@ -153,16 +207,12 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
         return br.saveAll(entityStream);
     }
 
-    @Override
-    public Mono<T> findById(ID id) {
-        return br.findById(id);
-    }
 
+    // 存在判断与计数方法
     @Override
-    public Mono<T> findById(Publisher<ID> id) {
-        return br.findById(id);
+    public Mono<Boolean> exists(com.querydsl.core.types.Predicate predicate) {
+        return br.exists(predicate);
     }
-
     @Override
     public Mono<Boolean> existsById(ID id) {
         return br.existsById(id);
@@ -174,25 +224,16 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     }
 
     @Override
-    public Flux<T> findAll() {
-        return br.findAll();
-    }
-
-    @Override
-    public Flux<T> findAllById(Iterable<ID> ids) {
-        return br.findAllById(ids);
-    }
-
-    @Override
-    public Flux<T> findAllById(Publisher<ID> idStream) {
-        return br.findAllById(idStream);
-    }
-
-    @Override
     public Mono<Long> count() {
         return br.count();
     }
 
+    @Override
+    public Mono<Long> count(com.querydsl.core.types.Predicate predicate) {
+        return br.count(predicate);
+    }
+
+    // 删除的方法
     @Override
     public Mono<Void> deleteById(ID id) {
         return br.deleteById(id);
@@ -221,41 +262,6 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     @Override
     public Mono<Void> deleteAll() {
         return br.deleteAll();
-    }
-
-    @Override
-    public Mono<T> findOne(com.querydsl.core.types.Predicate predicate) {
-        return br.findOne(predicate);
-    }
-
-    @Override
-    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate) {
-        return br.findAll(predicate);
-    }
-
-    @Override
-    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate, Sort sort) {
-        return br.findAll(predicate,sort);
-    }
-
-    @Override
-    public Flux<T> findAll(com.querydsl.core.types.Predicate predicate, OrderSpecifier<?>... orders) {
-        return br.findAll(predicate, orders);
-    }
-
-    @Override
-    public Flux<T> findAll(OrderSpecifier<?>... orders) {
-        return br.findAll(orders);
-    }
-
-    @Override
-    public Mono<Long> count(com.querydsl.core.types.Predicate predicate) {
-        return br.count(predicate);
-    }
-
-    @Override
-    public Mono<Boolean> exists(com.querydsl.core.types.Predicate predicate) {
-        return br.exists(predicate);
     }
 
     //以下为自定义的方法：

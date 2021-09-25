@@ -24,35 +24,7 @@ import java.util.Set;
  */
 public interface IBaseService<T extends BaseEntity, ID> {
 
-    /**
-     * Saves a given entity. Use the returned instance for further operations as the save operation might have changed the
-     * entity instance completely.
-     *
-     * @param entity must not be {@literal null}.
-     * @return {@link Mono} emitting the saved entity.
-     * @throws IllegalArgumentException in case the given {@literal entity} is {@literal null}.
-     */
-    <S extends T> Mono<S> save(S entity);
-
-    /**
-     * Saves all given entities.
-     *
-     * @param entities must not be {@literal null}.
-     * @return {@link Flux} emitting the saved entities.
-     * @throws IllegalArgumentException in case the given {@link Iterable entities} or one of its entities is
-     *           {@literal null}.
-     */
-    <S extends T> Flux<S> saveAll(Iterable<S> entities);
-
-    /**
-     * Saves all given entities.
-     *
-     * @param entityStream must not be {@literal null}.
-     * @return {@link Flux} emitting the saved entities.
-     * @throws IllegalArgumentException in case the given {@link Publisher entityStream} is {@literal null}.
-     */
-    <S extends T> Flux<S> saveAll(Publisher<S> entityStream);
-
+    // 查询的方法
     /**
      * Retrieves an entity by its id.
      *
@@ -70,32 +42,18 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @throws IllegalArgumentException in case the given {@link Publisher id} is {@literal null}.
      */
     Mono<T> findById(Publisher<ID> id);
-
     /**
-     * Returns whether an entity with the given {@literal id} exists.
+     * Returns a {@link Mono} emitting the entity matching the given {@link Predicate} or {@link Mono#empty()} if none was
+     * found.
      *
-     * @param id must not be {@literal null}.
-     * @return {@link Mono} emitting {@literal true} if an entity with the given id exists, {@literal false} otherwise.
-     * @throws IllegalArgumentException in case the given {@literal id} is {@literal null}.
+     * @param predicate must not be {@literal null}.
+     * @return a {@link Mono} emitting a single entity matching the given {@link Predicate} or {@link Mono#empty()} if
+     *         none was found.
+     * @throws IllegalArgumentException if the required parameter is {@literal null}.
+     * @throws org.springframework.dao.IncorrectResultSizeDataAccessException if the predicate yields more than one
+     *           result.
      */
-    Mono<Boolean> existsById(ID id);
-
-    /**
-     * Returns whether an entity with the given id, supplied by a {@link Publisher}, exists. Uses the first emitted
-     * element to perform the exists-query.
-     *
-     * @param id must not be {@literal null}.
-     * @return {@link Mono} emitting {@literal true} if an entity with the given id exists, {@literal false} otherwise.
-     * @throws IllegalArgumentException in case the given {@link Publisher id} is {@literal null}.
-     */
-    Mono<Boolean> existsById(Publisher<ID> id);
-
-    /**
-     * Returns all instances of the type.
-     *
-     * @return {@link Flux} emitting all entities.
-     */
-    Flux<T> findAll();
+    Mono<T> findOne(Predicate predicate);
 
     /**
      * Returns all instances of the type {@code T} with the given IDs.
@@ -125,12 +83,144 @@ public interface IBaseService<T extends BaseEntity, ID> {
     Flux<T> findAllById(Publisher<ID> idStream);
 
     /**
+     * Returns all instances of the type.
+     *
+     * @return {@link Flux} emitting all entities.
+     */
+    Flux<T> findAll();
+
+    /**
+     * Returns a {@link Flux} emitting all entities matching the given {@link Predicate}. In case no match could be found,
+     * {@link Flux} emits no items.
+     *
+     * @param predicate must not be {@literal null}.
+     * @return a {@link Flux} emitting all entities matching the given {@link Predicate} one by one.
+     * @throws IllegalArgumentException if the required parameter is {@literal null}.
+     */
+    Flux<T> findAll(Predicate predicate);
+
+    /**
+     * Returns all entities sorted by the given options.
+     *
+     * @param sort must not be {@literal null}.
+     * @return all entities sorted by the given options.
+     * @throws IllegalArgumentException in case the given {@link Sort} is {@literal null}.
+     */
+    Flux<T> findAll(Sort sort);
+
+    /**
+     * Returns a {@link Flux} emitting all entities matching the given {@link Predicate} applying the given {@link Sort}.
+     * In case no match could be found, {@link Flux} emits no items.
+     *
+     * @param predicate must not be {@literal null}.
+     * @param sort the {@link Sort} specification to sort the results by, may be {@link Sort#unsorted()}, must not be
+     *          {@literal null}.
+     * @return a {@link Flux} emitting all entities matching the given {@link Predicate} one by one.
+     * @throws IllegalArgumentException if one of the required parameters is {@literal null}.
+     */
+    Flux<T> findAll(Predicate predicate, Sort sort);
+
+    /**
+     * Returns a {@link Flux} emitting all entities matching the given {@link Predicate} applying the given
+     * {@link OrderSpecifier}s. In case no match could be found, {@link Flux} emits no items.
+     *
+     * @param predicate must not be {@literal null}.
+     * @param orders the {@link OrderSpecifier}s to sort the results by.
+     * @return a {@link Flux} emitting all entities matching the given {@link Predicate} applying the given
+     *         {@link OrderSpecifier}s.
+     * @throws IllegalArgumentException if one of the required parameter is {@literal null}, or contains a {@literal null}
+     *           value.
+     */
+    Flux<T> findAll(Predicate predicate, OrderSpecifier<?>... orders);
+
+    /**
+     * Returns a {@link Flux} emitting all entities ordered by the given {@link OrderSpecifier}s.
+     *
+     * @param orders the {@link OrderSpecifier}s to sort the results by.
+     * @return a {@link Flux} emitting all entities ordered by the given {@link OrderSpecifier}s.
+     * @throws IllegalArgumentException one of the {@link OrderSpecifier OrderSpecifiers} is {@literal null}.
+     */
+    Flux<T> findAll(OrderSpecifier<?>... orders);
+
+    // 保存的方法
+    /**
+     * Saves a given entity. Use the returned instance for further operations as the save operation might have changed the
+     * entity instance completely.
+     *
+     * @param entity must not be {@literal null}.
+     * @return {@link Mono} emitting the saved entity.
+     * @throws IllegalArgumentException in case the given {@literal entity} is {@literal null}.
+     */
+    <S extends T> Mono<S> save(S entity);
+
+    /**
+     * Saves all given entities.
+     *
+     * @param entities must not be {@literal null}.
+     * @return {@link Flux} emitting the saved entities.
+     * @throws IllegalArgumentException in case the given {@link Iterable entities} or one of its entities is
+     *           {@literal null}.
+     */
+    <S extends T> Flux<S> saveAll(Iterable<S> entities);
+
+    /**
+     * Saves all given entities.
+     *
+     * @param entityStream must not be {@literal null}.
+     * @return {@link Flux} emitting the saved entities.
+     * @throws IllegalArgumentException in case the given {@link Publisher entityStream} is {@literal null}.
+     */
+    <S extends T> Flux<S> saveAll(Publisher<S> entityStream);
+
+    // 存在判断与计数方法
+
+    /**
+     * Returns whether an entity with the given {@literal id} exists.
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link Mono} emitting {@literal true} if an entity with the given id exists, {@literal false} otherwise.
+     * @throws IllegalArgumentException in case the given {@literal id} is {@literal null}.
+     */
+    Mono<Boolean> existsById(ID id);
+
+    /**
+     * Returns whether an entity with the given id, supplied by a {@link Publisher}, exists. Uses the first emitted
+     * element to perform the exists-query.
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link Mono} emitting {@literal true} if an entity with the given id exists, {@literal false} otherwise.
+     * @throws IllegalArgumentException in case the given {@link Publisher id} is {@literal null}.
+     */
+    Mono<Boolean> existsById(Publisher<ID> id);
+    /**
+     * 检查数据存储是否包含与给定Predicate匹配的元素。
+     *
+     * 参数：
+     * predicate – 用于存在检查的Predicate ，不能为空。
+     * 返回：
+     * 如果数据存储包含与给定Predicate匹配的元素，则Mono发出 true ，否则发出 false 。
+     * 抛出：IllegalArgumentException – 如果所需参数为空。
+     *
+     */
+    Mono<Boolean> exists(Predicate predicate);
+
+    /**
      * Returns the number of entities available.
      *
      * @return {@link Mono} emitting the number of entities.
      */
     Mono<Long> count();
 
+    /**
+     * Returns a {@link Mono} emitting the number of instances matching the given {@link Predicate}.
+     *
+     * @param predicate the {@link Predicate} to count instances for, must not be {@literal null}.
+     * @return a {@link Mono} emitting the number of instances matching the {@link Predicate} or {@code 0} if none found.
+     * @throws IllegalArgumentException if the required parameter is {@literal null}.
+     */
+    Mono<Long> count(Predicate predicate);
+
+    // 删除的方法
     /**
      * Deletes the entity with the given id.
      *
@@ -183,86 +273,6 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return {@link Mono} signaling when operation has completed.
      */
     Mono<Void> deleteAll();
-
-
-    /**
-     * Returns a {@link Mono} emitting the entity matching the given {@link Predicate} or {@link Mono#empty()} if none was
-     * found.
-     *
-     * @param predicate must not be {@literal null}.
-     * @return a {@link Mono} emitting a single entity matching the given {@link Predicate} or {@link Mono#empty()} if
-     *         none was found.
-     * @throws IllegalArgumentException if the required parameter is {@literal null}.
-     * @throws org.springframework.dao.IncorrectResultSizeDataAccessException if the predicate yields more than one
-     *           result.
-     */
-    Mono<T> findOne(Predicate predicate);
-
-    /**
-     * Returns a {@link Flux} emitting all entities matching the given {@link Predicate}. In case no match could be found,
-     * {@link Flux} emits no items.
-     *
-     * @param predicate must not be {@literal null}.
-     * @return a {@link Flux} emitting all entities matching the given {@link Predicate} one by one.
-     * @throws IllegalArgumentException if the required parameter is {@literal null}.
-     */
-    Flux<T> findAll(Predicate predicate);
-
-    /**
-     * Returns a {@link Flux} emitting all entities matching the given {@link Predicate} applying the given {@link Sort}.
-     * In case no match could be found, {@link Flux} emits no items.
-     *
-     * @param predicate must not be {@literal null}.
-     * @param sort the {@link Sort} specification to sort the results by, may be {@link Sort#unsorted()}, must not be
-     *          {@literal null}.
-     * @return a {@link Flux} emitting all entities matching the given {@link Predicate} one by one.
-     * @throws IllegalArgumentException if one of the required parameters is {@literal null}.
-     */
-    Flux<T> findAll(Predicate predicate, Sort sort);
-
-    /**
-     * Returns a {@link Flux} emitting all entities matching the given {@link Predicate} applying the given
-     * {@link OrderSpecifier}s. In case no match could be found, {@link Flux} emits no items.
-     *
-     * @param predicate must not be {@literal null}.
-     * @param orders the {@link OrderSpecifier}s to sort the results by.
-     * @return a {@link Flux} emitting all entities matching the given {@link Predicate} applying the given
-     *         {@link OrderSpecifier}s.
-     * @throws IllegalArgumentException if one of the required parameter is {@literal null}, or contains a {@literal null}
-     *           value.
-     */
-    Flux<T> findAll(Predicate predicate, OrderSpecifier<?>... orders);
-
-    /**
-     * Returns a {@link Flux} emitting all entities ordered by the given {@link OrderSpecifier}s.
-     *
-     * @param orders the {@link OrderSpecifier}s to sort the results by.
-     * @return a {@link Flux} emitting all entities ordered by the given {@link OrderSpecifier}s.
-     * @throws IllegalArgumentException one of the {@link OrderSpecifier OrderSpecifiers} is {@literal null}.
-     */
-    Flux<T> findAll(OrderSpecifier<?>... orders);
-
-    /**
-     * Returns a {@link Mono} emitting the number of instances matching the given {@link Predicate}.
-     *
-     * @param predicate the {@link Predicate} to count instances for, must not be {@literal null}.
-     * @return a {@link Mono} emitting the number of instances matching the {@link Predicate} or {@code 0} if none found.
-     * @throws IllegalArgumentException if the required parameter is {@literal null}.
-     */
-    Mono<Long> count(Predicate predicate);
-
-    /**
-     * 检查数据存储是否包含与给定Predicate匹配的元素。
-     *
-     * 参数：
-     * predicate – 用于存在检查的Predicate ，不能为空。
-     * 返回：
-     * 如果数据存储包含与给定Predicate匹配的元素，则Mono发出 true ，否则发出 false 。
-     * 抛出：IllegalArgumentException – 如果所需参数为空。
-     *
-     */
-    Mono<Boolean> exists(Predicate predicate);
-
 
     // 上面的方法是框架自带的，下面的是用户自定义的方法
 
