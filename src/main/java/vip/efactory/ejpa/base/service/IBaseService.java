@@ -4,6 +4,7 @@ package vip.efactory.ejpa.base.service;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import org.reactivestreams.Publisher;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -141,6 +142,35 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @throws IllegalArgumentException one of the {@link OrderSpecifier OrderSpecifiers} is {@literal null}.
      */
     Flux<T> findAll(OrderSpecifier<?>... orders);
+    /**
+     * Returns a single entity matching the given {@link Example} or {@link Mono#empty()} if none was found.
+     *
+     * @param example must not be {@literal null}.
+     * @return a single entity matching the given {@link Example} or {@link Mono#empty()} if none was found.
+     * @throws org.springframework.dao.IncorrectResultSizeDataAccessException via {@link Mono#error(Throwable)} if the
+     *           example yields more than one result.
+     */
+    <S extends T> Mono<S> findOne(Example<S> example);
+
+    /**
+     * Returns all entities matching the given {@link Example}. In case no match could be found {@link Flux#empty()} is
+     * returned.
+     *
+     * @param example must not be {@literal null}.
+     * @return all entities matching the given {@link Example}.
+     */
+    <S extends T> Flux<S> findAll(Example<S> example);
+
+    /**
+     * Returns all entities matching the given {@link Example} applying the given {@link Sort}. In case no match could be
+     * found {@link Flux#empty()} is returned.
+     *
+     * @param example must not be {@literal null}.
+     * @param sort the {@link Sort} specification to sort the results by, must not be {@literal null}.
+     * @return all entities matching the given {@link Example}.
+     */
+    <S extends T> Flux<S> findAll(Example<S> example, Sort sort);
+
 
     // 保存的方法
     /**
@@ -205,6 +235,13 @@ public interface IBaseService<T extends BaseEntity, ID> {
     Mono<Boolean> exists(Predicate predicate);
 
     /**
+     * Checks whether the data store contains elements that match the given {@link Example}.
+     *
+     * @param example the {@link Example} to use for the existence check. Must not be {@literal null}.
+     * @return {@literal true} if the data store contains elements that match the given {@link Example}.
+     */
+    <S extends T> Mono<Boolean> exists(Example<S> example);
+    /**
      * Returns the number of entities available.
      *
      * @return {@link Mono} emitting the number of entities.
@@ -219,6 +256,14 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @throws IllegalArgumentException if the required parameter is {@literal null}.
      */
     Mono<Long> count(Predicate predicate);
+    /**
+     * Returns the number of instances matching the given {@link Example}.
+     *
+     * @param example the {@link Example} to count instances for. Must not be {@literal null}.
+     * @return the number of instances matching the {@link Example}.
+     */
+    <S extends T> Mono<Long> count(Example<S> example);
+
 
     // 删除的方法
     /**

@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -191,6 +192,21 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
         return br.findAll(orders);
     }
 
+    @Override
+    public <S extends T> Mono<S> findOne(Example<S> example) {
+        return br.findOne(example);
+    }
+
+    @Override
+    public <S extends T> Flux<S> findAll(Example<S> example) {
+        return br.findAll(example);
+    }
+
+    @Override
+    public <S extends T> Flux<S> findAll(Example<S> example, Sort sort) {
+        return br.findAll(example,sort);
+    }
+
     // 保存方法
     @Override
     public <S extends T> Mono<S> save(S entity) {
@@ -213,6 +229,12 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     public Mono<Boolean> exists(com.querydsl.core.types.Predicate predicate) {
         return br.exists(predicate);
     }
+
+    @Override
+    public <S extends T> Mono<Boolean> exists(Example<S> example) {
+        return br.exists(example);
+    }
+
     @Override
     public Mono<Boolean> existsById(ID id) {
         return br.existsById(id);
@@ -231,6 +253,11 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     @Override
     public Mono<Long> count(com.querydsl.core.types.Predicate predicate) {
         return br.count(predicate);
+    }
+
+    @Override
+    public <S extends T> Mono<Long> count(Example<S> example) {
+        return br.count(example);
     }
 
     // 删除的方法
