@@ -378,6 +378,8 @@ public interface IBaseService<T extends BaseEntity, ID> {
     Flux<T> advancedQuery(T entity, Pageable pageable);
 
 
+    Flux<T> advancedQuery(T entity, DataFilter dataFilter);
+
     /**
      * 查询某个属性集合,不包含重复数据
      *
@@ -436,6 +438,8 @@ public interface IBaseService<T extends BaseEntity, ID> {
      */
     Flux<T> findAll(Pageable var1, DataFilter filter);
 
+    Flux<T> findAll(DataFilter filter);
+
     /**
      * 根据查询条件及过滤条件查询列表数据
      *
@@ -463,6 +467,10 @@ public interface IBaseService<T extends BaseEntity, ID> {
      * @return Page<T>
      */
     Flux<T> getPageByFilter(Pageable pageable, Specification<T> spec, DataFilter filter);
+
+    Flux<T> getByFilter(DataFilter filter);
+
+    Flux<T> getByFilter(Specification<T> spec, DataFilter filter);
 
     /**
      * 根据查询条件及过滤条件查询总共有的记录数量

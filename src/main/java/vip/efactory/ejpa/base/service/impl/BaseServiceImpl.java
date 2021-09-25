@@ -294,23 +294,23 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     //以下为自定义的方法：
 
     @Override
-    public boolean existsByEntityProperty(String propertyName, String propertyValue) throws NoSuchFieldException {
+    public Mono<Boolean> existsByEntityProperty(String propertyName, String propertyValue) throws NoSuchFieldException {
         // 检查属性名是否合法，不合法抛异常
         if (isPropertyIllegal(propertyName)) {
             throw new NoSuchFieldException(propertyName + "不存在！");
         }
         // 查询该属性值的记录是否存在
         Set resultSet = advanceSearchProperty(propertyName, propertyValue);
-        return resultSet.size() > 0 ? true : false;
+        return Mono.just(resultSet.size() > 0 ? true : false);
     }
 
     @Override
-    public int deleteAllById(Iterable<ID> var1) {
+    public Mono<Integer> deleteAllById(Iterable<ID> var1) {
         String hql = "delete from " + clazz.getSimpleName() + " t where t.id in (?1)";
         Query query = em.createQuery(hql);
         query.setParameter(1, var1);
         int result = query.executeUpdate();
-        return result;
+        return Mono.just(result);
     }
 
     @Override
@@ -393,8 +393,8 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
         Specification<Object> specification = getSpec4PropSetByLike(property, value);
         Flux<Object> result = br.findAll(specification);
 
-        if (result != null && result.size() > 0) {
-            return new TreeSet<Object>(result); // 去除重复数据
+        if (result != null && result.count().block() > 0) {
+            return new TreeSet<Object>((Collection<?>) result.toIterable()); // 去除重复数据
         }
 
         return new TreeSet();
@@ -1043,7 +1043,7 @@ public class BaseServiceImpl<T extends BaseEntity, ID, BR extends BaseRepository
     }
 
     @Override
-    public Flux<T> getPageByFilter(DataFilter filter) {
+    public Flux<T> getByFilter(DataFilter filter) {
         Specification<T> filterSpec = handleDataFilterCondition(filter);
         Flux<T> page = br.findAll(filterSpec);
         return page;

@@ -30,7 +30,6 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -203,13 +202,13 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         }
 
         // 检查数据记录是否已经被删除了，被删除了，则不允许更新
-        Mono<T1> entityOptional = entityService.findById(entity.getId());
-        if (!entityOptional.isPresent()) {
+        T1 dbEntity = (T1) entityService.findById(entity.getId()).block();
+        if (null == dbEntity ) {
             return R.error(CommDBEnum.UPDATE_NON_EXISTENT);
         } else {
             // 检查更新时间戳，避免用旧的数据更新数据库里的新数据
             LocalDateTime updateTime = entity.getUpdateTime();
-            LocalDateTime dbUpdateTime = entityOptional.get().getUpdateTime();
+            LocalDateTime dbUpdateTime = dbEntity.getUpdateTime();
             if (updateTime != null && updateTime.compareTo(dbUpdateTime) != 0) {
                 return R.error(CommDBEnum.UPDATE_NEW_BY_OLD_NOT_ALLOWED);
             }
@@ -217,7 +216,7 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         //检查业务key的存在性，不应该存在重复的业务key,此处不知道业务key是什么属性，可以在在service层实现，重写方法即可！
 
         if (null != entity.getId()) {
-            updateEntity(entityOptional.get(), entity, false, "createTime", "updateTime");
+            updateEntity(dbEntity, entity, false, "createTime", "updateTime");
         }
 
         R r = R.ok().setData(entity);
@@ -239,8 +238,8 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
 
         //进行关联性检查,调用对应的方法
         // 在删除前用id到数据库查询一次,不执行空删除，不检查就可能会在数据库层面报错，尽量不让用户见到看不懂的信息
-        Optional entity = entityService.findById(id);
-        if (!entity.isPresent()) {
+        T1 entity = (T1) entityService.findById(id).block();
+        if (null == entity) {
             return R.error(CommDBEnum.DELETE_NON_EXISTENT);
         }
 
@@ -249,7 +248,6 @@ public class BaseController<T1 extends BaseEntity, T2 extends IBaseService, ID> 
         } catch (Exception e) {
             return R.error(e.getMessage());
         }
-
         return R.ok();
     }
 
